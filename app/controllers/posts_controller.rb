@@ -1,11 +1,17 @@
 class PostsController < ApplicationController
+  before_action :set_post, only: [:show, :edit, :update]
 
   def index
-    @posts = Post.all
+    # enable the action to return all the posts for a particular author
+    if params[:author_id]
+      @posts = Author.find_by(id: params[:author_id]).posts
+    else
+      @posts = Post.all
+    end
   end
 
   def show
-    @post = Post.find(params[:id])
+    # renders the same information whether it is accessed via /authors/:id/posts/:id or /posts/:id
   end
 
   def new
@@ -19,16 +25,17 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = Post.find(params[:id])
     @post.update(post_params)
     redirect_to post_path(@post)
   end
 
   def edit
-    @post = Post.find(params[:id])
   end
 
 private
+  def set_post
+    @post = Post.find(params[:id])
+  end
 
   def post_params
     params.require(:post).permit(:title, :desription, :post_status, :author_id)
